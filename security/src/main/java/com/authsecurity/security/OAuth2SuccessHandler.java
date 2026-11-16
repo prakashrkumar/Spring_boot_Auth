@@ -53,23 +53,39 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 String email   = oAuth2User.getAttributes().getOrDefault("email",   "").toString();
                 String name    = oAuth2User.getAttributes().getOrDefault("name",    "").toString();
                 String picture = oAuth2User.getAttributes().getOrDefault("picture", "").toString();
+                 String googleId = oAuth2User.getAttributes().getOrDefault("id", "").toString();
 
                 User newUser = User.builder()
                         .email(email)
                         .name(name)
                         .image(picture)
                         .enable(true)
+                        .providerId(googleId)
                         .provider(Provider.GOOGLE)
                         .build();
 
-                user = userRepository.findByEmail(email).orElseGet(() -> {
-                    logger.info("New Google user — saving to database");
-                    return userRepository.save(newUser);
-                });
-                logger.info("user: {}", user);
+                        user=userRepository.findByEmail(email).orElseGet(()->userRepository.save(newUser));
+
+            }
+            case "guthub"->{
+                String name=oAuth2User.getAttributes().getOrDefault("login", "").toString();
+                  String email=oAuth2User.getAttributes().getOrDefault("email", "").toString();
+                    String githubId=oAuth2User.getAttributes().getOrDefault("id", "").toString();
+                      String image=oAuth2User.getAttributes().getOrDefault("avatar_url", "").toString();
+                          User newUser = User.builder()
+                        .email(email)
+                        .name(name)
+                        .image(image)
+                        .enable(true)
+                        .providerId(githubId)
+                        .provider(Provider.GITHUB)
+                        .build();
+
+                        user=userRepository.findByEmail(email).orElseGet(()->userRepository.save(newUser));
             }
             default -> throw new RuntimeException("Invalid registration id: " + registrationId);
           }
+         
           // jwt token__token ke sath front -- per fir redirect
           // new refresh toke banuga
          String jti=UUID.randomUUID().toString();
