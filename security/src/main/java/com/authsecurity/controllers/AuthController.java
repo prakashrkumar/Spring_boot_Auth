@@ -53,6 +53,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {
+
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerUser(userDto));
     }
 

@@ -5,6 +5,9 @@ package com.authsecurity.services.impl;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.authsecurity.config.AppConstants;
+import com.authsecurity.entities.Role;
+import com.authsecurity.repositories.RoleRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private  final ModelMapper modelMapper;
-    
+    private final RoleRepository roleRepository;
 @Override
  @Transactional 
 public UserDto createUser(UserDto userDto) {
@@ -34,7 +37,12 @@ public UserDto createUser(UserDto userDto) {
     throw new IllegalArgumentException("user with given email already exists");
   }
   User user=modelMapper.map(userDto,User.class);
+  user.setEnable(userDto.getEnable() == null || userDto.getEnable());
   user.setProvider(userDto.getProvider()!=null? userDto.getProvider():Provider.LOCAL);
+  //assign the default role
+    Role role=roleRepository.findByName("ROLE_" + AppConstants.GUEST_ROLE).orElse(null);
+   user.getRoles().add(role);
+
   User savedUser=userRepository.save(user);
 
   return modelMapper.map(savedUser,UserDto.class);
@@ -80,7 +88,9 @@ public UserDto updateUser(UserDto userDto, String userId) {
     if(userDto.getPassword()!=null){
         existingUser.setPassword(userDto.getPassword());
     }
-    existingUser.setEnable(userDto.isEnable());
+    if (userDto.getEnable() != null) {
+        existingUser.setEnable(userDto.getEnable());
+    }
     existingUser.setUpdatedAt(Instant.now());
     User updatedUser=userRepository.save(existingUser);
     return modelMapper.map(updatedUser, UserDto.class);
