@@ -94,11 +94,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .build();
         refreshTokenRepository.save(refreshTokenOb);
 
-        String accessToken  = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user, refreshTokenOb.getJti());
         cookieService.attachRefreshTokenCookie(response, refreshToken, (int) jwtService.getRefreshTtlSeconds());
+        cookieService.addNoStoreHeaders(response);
 
-        // Redirect to frontend with accessToken as query param
-        response.sendRedirect(frontEndSuccessUrl + "?accessToken=" + accessToken);
+        response.sendRedirect(frontEndSuccessUrl);
     }
 }

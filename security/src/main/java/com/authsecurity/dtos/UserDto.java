@@ -27,10 +27,9 @@ public class UserDto {
     private String name;
     private String image;
     private String password;
-    private boolean enable;
+    private Boolean enable;
     private Provider provider;
     private Set<RoleDto> roles;
 }
 
     
-

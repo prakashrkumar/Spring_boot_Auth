@@ -1,7 +1,9 @@
 package com.authsecurity.controllers;
 
+import com.authsecurity.config.AppConstants;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,6 +48,7 @@ public class UserController {
       return ResponseEntity.ok(userService.updateUser(userDto, userId));
     }
     @GetMapping ("/{userId}")
+    @PreAuthorize("hasRole('"+ AppConstants.ADMIN_ROLE +"_')")
     public ResponseEntity<UserDto>getUserById(@PathVariable("userId") String userId){
         return ResponseEntity.ok(userService.getUserById(userId));
     }
