@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.authsecurity.dtos.ApiError;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AuthenticationSuccessHandler successHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -40,9 +42,21 @@ public class SecurityConfig {
         http.cors(Customizer.withDefaults());
         http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth ->
-            auth.requestMatchers("/api/v1/auth/register", "/api/v1/auth/login","/api/v1/auth/refresh","/api/v1/auth/logout").permitAll()
-                .anyRequest().authenticated()
-        ).exceptionHandling(ex -> ex.authenticationEntryPoint(
+            auth.requestMatchers(
+                    "/api/v1/auth/register",
+                    "/api/v1/auth/login",
+                    "/api/v1/auth/refresh",
+                    "/api/v1/auth/logout"
+            ).permitAll()
+            .anyRequest().authenticated()
+        )//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        .oauth2Login(oauth2 -> oauth2
+            .successHandler(successHandler)
+            .failureHandler(null)
+        )
+        .logout(AbstractHttpConfigurer::disable)
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        .exceptionHandling(ex -> ex.authenticationEntryPoint(
             (HttpServletRequest request, HttpServletResponse response, AuthenticationException authEx) -> {
                 authEx.printStackTrace();
                 response.setStatus(401);
@@ -61,7 +75,9 @@ public class SecurityConfig {
                 ObjectMapper objectMapper = new ObjectMapper();
                 response.getWriter().write(objectMapper.writeValueAsString(apiError));
             }
-        )).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        ))
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
