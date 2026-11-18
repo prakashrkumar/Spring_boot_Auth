@@ -48,6 +48,10 @@ public class JwtService {
         return this.accessTtlSeconds;
     }
 
+    public long getRefreshTtlSeconds() {
+        return this.refreshTtlSeconds;
+    }
+
     // generate token
     public String generateAccessToken(User user){
         Instant now = Instant.now();
