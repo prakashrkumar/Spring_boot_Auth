@@ -2,6 +2,7 @@ package com.authsecurity.services.impl;
 
 
 
+import java.time.Instant;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
@@ -80,6 +81,7 @@ public UserDto updateUser(UserDto userDto, String userId) {
         existingUser.setPassword(userDto.getPassword());
     }
     existingUser.setEnable(userDto.isEnable());
+    existingUser.setUpdatedAt(Instant.now());
     User updatedUser=userRepository.save(existingUser);
     return modelMapper.map(updatedUser, UserDto.class);
 }

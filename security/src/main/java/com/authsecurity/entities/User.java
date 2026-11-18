@@ -1,12 +1,16 @@
 package com.authsecurity.entities;
 
-
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,48 +31,99 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-@Getter 
-@Setter 
-@AllArgsConstructor 
+
+@Getter
+@Setter
+@AllArgsConstructor
 @NoArgsConstructor
-@Builder 
-@Entity 
-@Table(name="user")
+@Builder
+@Entity
+@Table(name = "user")
+public class User implements UserDetails {
 
-public class User {
-    @Id 
- @GeneratedValue (strategy = GenerationType.UUID)
- @Column (name = "user_id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "user_id")
     private UUID id;
-    @Column(name ="user_email",unique =true)
-    private String email;
-    @Column(name ="user_name",length =50)
-    private  String name;
-    @Column(name ="user_password")
-    private  String password;
-    private  String image;
-    private  boolean enable=true;
-    private  Instant createdAt=Instant.now();
-    private  Instant updatedAt=Instant.now();
-    @Enumerated(EnumType.STRING)
-    private Provider provider=Provider.LOCAL;
-    @ManyToMany (fetch =FetchType.EAGER)
-    @JoinTable(name="user_role",
-        joinColumns =@JoinColumn(name="user_id"),
-        inverseJoinColumns =@JoinColumn(name ="role_id")
-    )
-    private Set<Role>roles=new HashSet<>();
- @PrePersist 
-    protected void onCreate(){
-        Instant now=Instant.now();
-        if(createdAt==null){
-            createdAt=now;
-        }
-        updatedAt=now;
 
+    @Column(name = "user_email", unique = true)
+    private String email;
+
+    @Column(name = "user_name", length = 50)
+    private String name;
+
+    @Column(name = "user_password")
+    private String password;
+
+    private String image;
+
+    private boolean enable = true;
+
+    private Instant createdAt = Instant.now();
+
+    private Instant updatedAt = Instant.now();
+
+    @Enumerated(EnumType.STRING)
+    private Provider provider = Provider.LOCAL;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
+    // ========== UserDetails Methods ==========
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+       List<SimpleGrantedAuthority>authorities= roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName())).toList();
+         return authorities;     
     }
-    @PreUpdate 
-    protected  void OnUpdate(){
-        updatedAt=Instant.now();
+
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.enable;
+    }
+
+    // ========== Lifecycle Callbacks ==========
+
+    @PrePersist
+    protected void onCreate() {
+        Instant now = Instant.now();
+        if (createdAt == null) {
+            createdAt = now;
+        }
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = Instant.now();
     }
 }
