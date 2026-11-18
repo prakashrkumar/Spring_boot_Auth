@@ -39,7 +39,7 @@ public class CookieService {
 
     // create method to attach cookie to response
     public void attachRefreshTokenCookie(HttpServletResponse response, String value, int maxAge) {
-        logger.info("Attaching cookie with name:{} and value :{}", refreshTokenCookieName,value);
+        logger.info("Attaching refresh token cookie with name: {}", refreshTokenCookieName);
         ResponseCookie.ResponseCookieBuilder responseCookieBuilder = ResponseCookie.from(refreshTokenCookieName, value)
                 .httpOnly(cookieHttpOnly)
                 .secure(cookieSecure)
@@ -73,7 +73,7 @@ public class CookieService {
     }
 
     public void addNoStoreHeaders(HttpServletResponse response) {
-        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-cache");
+        response.setHeader(HttpHeaders.CACHE_CONTROL, "no-store");
         response.setHeader("Pragma", "no-cache");
     }
 }
