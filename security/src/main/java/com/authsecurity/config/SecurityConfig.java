@@ -58,9 +58,11 @@ public class SecurityConfig {
                         auth.requestMatchers(
                                         AppConstants.AUTH_PUBLIC_URLS
                                 ).permitAll()
-                                .requestMatchers(HttpMethod.GET, "/**").hasRole(AppConstants.GUEST_ROLE)
-                                .requestMatchers("/api/v1/users/**").hasRole(AppConstants.ADMIN_ROLE)
+                                .requestMatchers(AppConstants.AUTH_ADMIN_URLS).hasRole(AppConstants.ADMIN_ROLE)
+                                .requestMatchers(AppConstants.AUTH_GUEST_URLS).hasRole(AppConstants.GUEST_ROLE)
                                 .anyRequest().authenticated()
+
+
                 )//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(successHandler)
