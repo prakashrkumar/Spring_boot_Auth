@@ -55,7 +55,12 @@ public class SecurityConfig {
         http.cors(Customizer.withDefaults());
         http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth ->
-                        auth.requestMatchers(
+                        auth.requestMatchers(HttpMethod.POST,
+                                        "/api/v1/auth/register",
+                                        "/api/v1/auth/login"
+                                ).permitAll()
+                                .requestMatchers("/error").permitAll()
+                                .requestMatchers(
                                         AppConstants.AUTH_PUBLIC_URLS
                                 ).permitAll()
                                 .requestMatchers(AppConstants.AUTH_ADMIN_URLS).hasRole(AppConstants.ADMIN_ROLE)

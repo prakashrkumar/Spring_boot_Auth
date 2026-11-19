@@ -39,9 +39,13 @@ public UserDto createUser(UserDto userDto) {
   User user=modelMapper.map(userDto,User.class);
   user.setEnable(userDto.getEnable() == null || userDto.getEnable());
   user.setProvider(userDto.getProvider()!=null? userDto.getProvider():Provider.LOCAL);
+  if (user.getRoles() == null) {
+      user.setRoles(new java.util.HashSet<>());
+  }
   //assign the default role
-    Role role=roleRepository.findByName("ROLE_" + AppConstants.GUEST_ROLE).orElse(null);
-   user.getRoles().add(role);
+  Role role=roleRepository.findByName("ROLE_" + AppConstants.GUEST_ROLE)
+          .orElseThrow(() -> new IllegalStateException("Default guest role is missing"));
+  user.getRoles().add(role);
 
   User savedUser=userRepository.save(user);
 

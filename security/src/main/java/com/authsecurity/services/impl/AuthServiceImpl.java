@@ -23,10 +23,7 @@ public UserDto registerUser(UserDto userDto) {
    
     // hashing password
     userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
- UserDto userDto1=userService.createUser(userDto);
-
-
-    return userService.createUser(userDto1);
+    return userService.createUser(userDto);
 
 
     
