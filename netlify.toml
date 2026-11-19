@@ -1,0 +1,15 @@
+[build]
+  command = ""
+  publish = "public"
+
+[[redirects]]
+  from = "/"
+  to = "https://reactauthf.netlify.app/login"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/login"
+  to = "https://reactauthf.netlify.app/login"
+  status = 302
+  force = true
