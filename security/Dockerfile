@@ -24,12 +24,13 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
+ENV SPRING_PROFILES_ACTIVE=prod
 
 # Copy JAR from build stage
 COPY --from=build /app/target/*.jar app.jar
 
 # Expose Spring Boot port
-EXPOSE 8082
+EXPOSE 8080
 
 # Run Spring Boot application
 ENTRYPOINT ["java", "-jar", "app.jar"]
